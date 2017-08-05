@@ -11,40 +11,72 @@ import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
 
 public class Test {
-	public static final String storageConnectionString ="";
 
-		public static void main(String[] args) {
-			try {
-				CloudStorageAccount account = CloudStorageAccount.parse(storageConnectionString);
-	            CloudBlobClient serviceClient = account.createCloudBlobClient();
+	public static void main(String...args) {
+		String command = args[0];
+		String storageConnectionString = args[1];
+		String containerName = args[2];
+		String dstFilePath = args[3];
+		String srcFilePath = args[4];
+		String filename = args[5];
+		File dstFile = new File(dstFilePath, filename);
+		File srcFile = new File(srcFilePath, filename);
 
-	            // Container name must be lower case.
-	            CloudBlobContainer container = serviceClient.getContainerReference("containerName");
-	            container.createIfNotExists();
+		System.out.println(dstFile.toString());
 
-	            // Upload an image file.
-	            CloudBlockBlob blob = container.getBlockBlobReference("targetFilePath");
-	            File sourceFile = new File("filePath");
-	            blob.upload(new FileInputStream(sourceFile), sourceFile.length());
+		try {
+			CloudStorageAccount account = CloudStorageAccount.parse(storageConnectionString);
+            CloudBlobClient serviceClient = account.createCloudBlobClient();
+            CloudBlobContainer container = serviceClient.getContainerReference(containerName);
+            container.createIfNotExists();
 
-	            // Download the image file.
-	            File destinationFile = new File(sourceFile.getParentFile(), "Filename");
-	            blob.downloadToFile(destinationFile.getAbsolutePath());
-	        }
-	        catch (FileNotFoundException fileNotFoundException) {
-	            System.out.print("FileNotFoundException encountered: ");
-	            System.out.println(fileNotFoundException.getMessage());
-	            System.exit(-1);
-	        }
-	        catch (StorageException storageException) {
-	            System.out.print("StorageException encountered: ");
-	            System.out.println(storageException.getMessage());
-	            System.exit(-1);
-	        }
-	        catch (Exception e) {
-	            System.out.print("Exception encountered: ");
-	            System.out.println(e.getMessage());
-	            System.exit(-1);
-	        }
-		}
+            CloudBlockBlob blob = container.getBlockBlobReference(dstFile.toString());
+
+            if (command.equals("upload")) upload(blob, srcFile);
+            else if(command.equals("download")) download(blob, srcFile);
+
+        } catch (StorageException storageException) {
+            System.out.print("StorageException encountered: ");
+            System.out.println(storageException.getMessage());
+            System.exit(-1);
+        } catch (Exception e) {
+            System.out.print("Exception encountered: ");
+            System.out.println(e.getMessage());
+            System.exit(-1);
+        }
+	}
+
+	private static void upload(CloudBlockBlob blob, File srcFile) {
+		System.out.println("upload: src=" + srcFile.getAbsolutePath());
+        try {
+        	blob.upload(new FileInputStream(srcFile), srcFile.length());
+        } catch (FileNotFoundException fileNotFoundException) {
+            System.out.print("FileNotFoundException encountered: ");
+            System.out.println(fileNotFoundException.getMessage());
+            System.exit(-1);
+        } catch (StorageException storageException) {
+            System.out.print("StorageException encountered: ");
+            System.out.println(storageException.getMessage());
+            System.exit(-1);
+	    } catch (Exception e) {
+            System.out.print("Exception encountered: ");
+            System.out.println(e.getMessage());
+            System.exit(-1);
+        }
+	}
+
+	private static void download(CloudBlockBlob blob, File srcFile) {
+		System.out.println("download: src=" + srcFile.getAbsolutePath());
+        try {
+			blob.downloadToFile(srcFile.getAbsolutePath());
+        } catch (StorageException storageException) {
+            System.out.print("StorageException encountered: ");
+            System.out.println(storageException.getMessage());
+            System.exit(-1);
+	    } catch (Exception e) {
+            System.out.print("Exception encountered: ");
+            System.out.println(e.getMessage());
+            System.exit(-1);
+        }
+	}
 }
