@@ -14,7 +14,6 @@ public class Test {
 	public static final String storageConnectionString ="";
 
 		public static void main(String[] args) {
-			System.out.println("test start");
 			try {
 				CloudStorageAccount account = CloudStorageAccount.parse(storageConnectionString);
 	            CloudBlobClient serviceClient = account.createCloudBlobClient();
