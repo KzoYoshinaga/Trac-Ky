@@ -14,6 +14,7 @@ public class Test {
 	public static final String storageConnectionString ="DefaultEndpointsProtocol=https;AccountName=trackytest;AccountKey=c1AGXKlmQP0kb8wD/VX4bDM9CDkGyjCC0PgENAw7dLI6ypvScSoeNtnpjolvErWc90FHR02L22QSiDREpk9RbQ==;EndpointSuffix=core.windows.net";
 
 		public static void main(String[] args) {
+			System.out.println("test start");
 			try {
 				CloudStorageAccount account = CloudStorageAccount.parse(storageConnectionString);
 	            CloudBlobClient serviceClient = account.createCloudBlobClient();
