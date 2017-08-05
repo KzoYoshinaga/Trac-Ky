@@ -1,0 +1,7 @@
+
+
+package src
+
+object Main extends App {
+  println("Hello Scala")
+}
