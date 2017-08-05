@@ -11,7 +11,7 @@ import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
 
 public class Test {
-	public static final String storageConnectionString ="DefaultEndpointsProtocol=https;AccountName=trackytest;AccountKey=c1AGXKlmQP0kb8wD/VX4bDM9CDkGyjCC0PgENAw7dLI6ypvScSoeNtnpjolvErWc90FHR02L22QSiDREpk9RbQ==;EndpointSuffix=core.windows.net";
+	public static final String storageConnectionString ="";
 
 		public static void main(String[] args) {
 			System.out.println("test start");
@@ -20,16 +20,16 @@ public class Test {
 	            CloudBlobClient serviceClient = account.createCloudBlobClient();
 
 	            // Container name must be lower case.
-	            CloudBlobContainer container = serviceClient.getContainerReference("new");
+	            CloudBlobContainer container = serviceClient.getContainerReference("containerName");
 	            container.createIfNotExists();
 
 	            // Upload an image file.
-	            CloudBlockBlob blob = container.getBlockBlobReference("test\\fb_ritz.jpg");
-	            File sourceFile = new File("C:\\Users\\Kzo\\Pictures\\fb_ritz.jpg");
+	            CloudBlockBlob blob = container.getBlockBlobReference("targetFilePath");
+	            File sourceFile = new File("filePath");
 	            blob.upload(new FileInputStream(sourceFile), sourceFile.length());
 
 	            // Download the image file.
-	            File destinationFile = new File(sourceFile.getParentFile(), "fb_ritzDownload.tmp");
+	            File destinationFile = new File(sourceFile.getParentFile(), "Filename");
 	            blob.downloadToFile(destinationFile.getAbsolutePath());
 	        }
 	        catch (FileNotFoundException fileNotFoundException) {
