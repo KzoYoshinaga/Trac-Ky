@@ -34,6 +34,8 @@ public class Test {
 
             if (command.equals("upload")) upload(blob, srcFile);
             else if(command.equals("download")) download(blob, srcFile);
+            else if (command.equals("delete")) delete(blob);
+
 
         } catch (StorageException storageException) {
             System.out.print("StorageException encountered: ");
@@ -69,6 +71,21 @@ public class Test {
 		System.out.println("download: src=" + srcFile.getAbsolutePath());
         try {
 			blob.downloadToFile(srcFile.getAbsolutePath());
+        } catch (StorageException storageException) {
+            System.out.print("StorageException encountered: ");
+            System.out.println(storageException.getMessage());
+            System.exit(-1);
+	    } catch (Exception e) {
+            System.out.print("Exception encountered: ");
+            System.out.println(e.getMessage());
+            System.exit(-1);
+        }
+	}
+
+	public static void delete(CloudBlockBlob blob) {
+		System.out.println("delete: dst=" + blob.getName());
+        try {
+			blob.delete();
         } catch (StorageException storageException) {
             System.out.print("StorageException encountered: ");
             System.out.println(storageException.getMessage());

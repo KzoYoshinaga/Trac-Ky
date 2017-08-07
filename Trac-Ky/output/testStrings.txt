@@ -1,1 +1,3 @@
 upload DefaultEndpointsProtocol=https;AccountName=trackytest;AccountKey=c1AGXKlmQP0kb8wD/VX4bDM9CDkGyjCC0PgENAw7dLI6ypvScSoeNtnpjolvErWc90FHR02L22QSiDREpk9RbQ==;EndpointSuffix=core.windows.net new test C:\Users\Kzo\Pictures fb_ritz.jpg
+download DefaultEndpointsProtocol=https;AccountName=trackytest;AccountKey=c1AGXKlmQP0kb8wD/VX4bDM9CDkGyjCC0PgENAw7dLI6ypvScSoeNtnpjolvErWc90FHR02L22QSiDREpk9RbQ==;EndpointSuffix=core.windows.net new test C:\Users\Kzo\Pictures fb_ritz.jpg
+delete DefaultEndpointsProtocol=https;AccountName=trackytest;AccountKey=c1AGXKlmQP0kb8wD/VX4bDM9CDkGyjCC0PgENAw7dLI6ypvScSoeNtnpjolvErWc90FHR02L22QSiDREpk9RbQ==;EndpointSuffix=core.windows.net new test C:\Users\Kzo\Pictures fb_ritz.jpg
