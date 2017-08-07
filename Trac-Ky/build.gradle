@@ -21,6 +21,8 @@ dependencies {
 	compile 'com.microsoft.azure:azure:1.1.0'
 	compile 'com.microsoft.azure:azure-storage:5.4.0'
 
+	compile 'args4j:args4j:2.33'
+
 
     testCompile 'junit:junit:4.12'
 }
