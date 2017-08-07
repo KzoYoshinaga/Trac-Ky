@@ -46,7 +46,7 @@ public class Test {
         }
 	}
 
-	private static void upload(CloudBlockBlob blob, File srcFile) {
+	public static void upload(CloudBlockBlob blob, File srcFile) {
 		System.out.println("upload: src=" + srcFile.getAbsolutePath());
         try {
         	blob.upload(new FileInputStream(srcFile), srcFile.length());
@@ -65,7 +65,7 @@ public class Test {
         }
 	}
 
-	private static void download(CloudBlockBlob blob, File srcFile) {
+	public static void download(CloudBlockBlob blob, File srcFile) {
 		System.out.println("download: src=" + srcFile.getAbsolutePath());
         try {
 			blob.downloadToFile(srcFile.getAbsolutePath());
