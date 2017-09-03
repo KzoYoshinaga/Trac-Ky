@@ -60,10 +60,8 @@ class PlayScreen {
     SwingUtilities.invokeLater(new Runnable(){override def run() = c})
 }
 
-import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser
-import chrriis.dj.nativeswing.swtimpl.components.WebBrowserAdapter
-import chrriis.dj.nativeswing.swtimpl.components.WebBrowserListener
-import chrriis.dj.nativeswing.swtimpl.components.WebBrowserNavigationEvent
+import chrriis.dj.nativeswing.swtimpl.components.
+  {JWebBrowser,WebBrowserAdapter,WebBrowserListener,WebBrowserNavigationEvent}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 private[screen] class Display extends JWebBrowser {
