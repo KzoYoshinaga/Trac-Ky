@@ -29,26 +29,23 @@ class PlayScreen {
   import chrriis.common.UIUtils
   import javax.swing.SwingUtilities
 
-  val display = new Display
-  val frame = new JFrame("Kancolle Browser")
+  private val display = new Display
+  private val frame = new JFrame("Kancolle Browser")
 
   def showScreen(): Unit = {
     NativeInterface.open()
     UIUtils.setPreferredLookAndFeel()
     SwingUtilities.invokeLater(new Runnable() {
-      override def run() ={
+      override def run() = {
         frame.setAlwaysOnTop(true)
         frame.setUndecorated(true)
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
         frame.getContentPane().setLayout(null)
         frame.getContentPane().add(display)
         frame.setSize(Conf.dW, Conf.dH)
-        frame.setLocation(Conf.dX, Conf.dY);
-        frame.setResizable(false);
-        frame.setVisible(true);
-        }
-    })
-  }
+        frame.setLocation(Conf.dX, Conf.dY)
+        frame.setResizable(false)
+        frame.setVisible(true)}})}
   def close() = {
     frame.dispose()
     controllScreen(display.disposeNativePeer())
@@ -60,22 +57,23 @@ class PlayScreen {
     SwingUtilities.invokeLater(new Runnable(){override def run() = c})
 }
 
-import chrriis.dj.nativeswing.swtimpl.components.
-  {JWebBrowser,WebBrowserAdapter,WebBrowserListener,WebBrowserNavigationEvent}
+import chrriis.dj.nativeswing.swtimpl.components._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 private[screen] class Display extends JWebBrowser {
-  private def locationChangedListener(t: Unit): WebBrowserAdapter =
-    new WebBrowserAdapter() { override def locationChanged(e: WebBrowserNavigationEvent) = t }
-  private val urlOperator = locationChangedListener {
-    getResourceLocation match {
-      case url if url.startsWith(Conf.loginUrlStartWith) => executeJavascript(Conf.accountJS)
+
+  this.addWebBrowserListener(new WebBrowserAdapter() {
+    override def locationChanged(e: WebBrowserNavigationEvent) = {
+      getResourceLocation match {
+      case url if url.startsWith(Conf.loginUrlStartWith) =>
+        Option(Jsoup.parse(getHTMLContent)).foreach(_ => executeJavascript(Conf.accountJS))
       case url if url.startsWith(Conf.gameUrlStartWith) =>
         Option(Jsoup.parse(getHTMLContent).select("iframe#game_frame").first)
           .foreach(u => navigate(u.attr("src")))
-      case _ => Unit }}
+      case _ => Unit }
+    }
+  })
 
-  this.addWebBrowserListener(urlOperator)
   this.setBounds(Conf.pX, Conf.pY, Conf.pH,Conf.pW)
   this.setBarsVisible(false)
   this.setMenuBarVisible(false)
