@@ -49,7 +49,6 @@ class PlayScreen {
         }
     })
   }
-
   def close() = {
     frame.dispose()
     controllScreen(display.disposeNativePeer())
@@ -58,28 +57,27 @@ class PlayScreen {
   def navigate(url: String) = controllScreen(display.navigate(url))
   def reload() = controllScreen(display.reloadPage())
   private def controllScreen(c: => Unit) =
-    SwingUtilities.invokeLater(new Runnable(){override def run()=c})
+    SwingUtilities.invokeLater(new Runnable(){override def run() = c})
 }
 
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserAdapter
+import chrriis.dj.nativeswing.swtimpl.components.WebBrowserListener
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserNavigationEvent
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 private[screen] class Display extends JWebBrowser {
+  private def locationChangedListener(t: Unit): WebBrowserAdapter =
+    new WebBrowserAdapter() { override def locationChanged(e: WebBrowserNavigationEvent) = t }
+  private val urlOperator = locationChangedListener {
+    getResourceLocation match {
+      case url if url.startsWith(Conf.loginUrlStartWith) => executeJavascript(Conf.accountJS)
+      case url if url.startsWith(Conf.gameUrlStartWith) =>
+        Option(Jsoup.parse(getHTMLContent).select("iframe#game_frame").first)
+          .foreach(u => navigate(u.attr("src")))
+      case _ => Unit }}
 
-  this.addWebBrowserListener(new WebBrowserAdapter() {
-    override def locationChanged(e: WebBrowserNavigationEvent) = {
-      getResourceLocation match {
-        case url if url.startsWith(Conf.loginUrlStartWith) => executeJavascript(Conf.accountJS)
-        case url if url.startsWith(Conf.gameUrlStartWith) =>
-          Option(Jsoup.parse(getHTMLContent).select("iframe#game_frame").first)
-            .foreach(u => navigate(u.attr("src")))
-        case _ =>
-      }
-    }
-  })
-
+  this.addWebBrowserListener(urlOperator)
   this.setBounds(Conf.pX, Conf.pY, Conf.pH,Conf.pW)
   this.setBarsVisible(false)
   this.setMenuBarVisible(false)
