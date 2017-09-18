@@ -1,0 +1,85 @@
+package db
+
+import slick.jdbc.SQLiteProfile
+import slick.jdbc.SQLiteProfile.api._
+import slick.basic.DatabasePublisher
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration.Duration
+import scala.io.Source
+import java.nio.file.Paths
+import java.io.File
+
+object DBTest extends App {
+  val db = Database.forURL("jdbc:sqlite:db.sqlite3", driver = "org.sqlite.JDBC")
+  val root = "count"
+  val extention = ".count"
+  try {
+    val log = TableQuery[Log]
+    val logFile = TableQuery[LogFile]
+    //Await.result(db.run(log.schema.create), Duration.Inf)
+    //Await.result(db.run(logFile.schema.create), Duration.Inf)
+    def upserting(file: File): Unit =
+      Source.fromFile(file).getLines
+        .map(LogRecord(_))
+        .foreach { r =>
+          val c = log.filter(r.equals(_)).map(_.count)
+          val i = (Await.result(db.run(c.result),Duration.Inf) ++ Seq(0)).head
+          val q = log.insertOrUpdate(r.addCount(i).tuple)
+          Await.result(db.run(q), Duration.Inf) }
+    def yetDone(file: File): Boolean = {
+      val q = logFile.filter(_.name === FileUtils.relativize(root, file)).exists
+      !Await.result(db.run(q.result), Duration.Inf)}
+    def registerFile(file: File): Unit = {
+      val q = logFile.insertOrUpdate(FileUtils.relativize(root, file))
+      Await.result(db.run(q), Duration.Inf)}
+    FileUtils.lsa(root)
+      .filter(_.getName.endsWith(extention))
+      .filter(yetDone)
+      .foreach{f => upserting(f); registerFile(f); println(s"import $f")}
+  } finally db.close()
+}
+
+object LogRecord {
+  def apply(s: String):LogRecord = {
+    val e = s.split(" ");
+    LogRecord(e(0), e(1), e(2), e(3), e(4).toInt)
+  }
+}
+case class LogRecord(date:String, url:String, extention: String, status: String, count:Int) {
+  def tuple = (date, url, extention, status, count)
+  def addCount(c: Int) = LogRecord(date, url, extention, status, count + c)
+  def equals(t: Log) = t.date === date && t.url === url && t.extention === extention && t.status === status
+}
+class Log(tag: Tag) extends Table[(String, String, String, String, Int)](tag, "Log") {
+  def date = column[String]("DATE")
+  def url = column[String]("URL")
+  def extention = column[String]("EXTENTION")
+  def status = column[String]("STATUS")
+  def count = column[Int]("COUNT")
+  def pk = primaryKey("pk", (date, url, extention, status))
+  def * = (date, url, extention, status, count)
+}
+
+case class LogFileRecord(name: String) {
+  def equals(t: LogFile): Boolean = t.name.toString == name
+}
+class LogFile(tag: Tag) extends Table[(String)](tag, "LogFile") {
+  def name = column[String]("NAME")
+  def * = (name)
+  def pk = primaryKey("pk", name)
+}
+
+object FileUtils {
+  import java.nio.file.Paths
+  import java.io.File
+  def relativize(root: String, file: File): String = Paths.get(root).relativize(file.toPath).toString
+  def lsa(root: String): Array[File] = lsa(Paths.get(root).toFile())
+  def lsa(root: File): Array[File] = {
+    def listFile(files: Array[File], acc: Array[File]): Array[File] = files.flatMap(file =>
+      file.isDirectory match {
+        case false => acc :+ file
+        case true => listFile(file.listFiles, acc)
+      })
+    listFile(root.listFiles, Array.empty)}
+}
